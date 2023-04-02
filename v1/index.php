@@ -645,11 +645,77 @@ $app->post('/FetchCategoryWiseProduct',function($request, $response, $args) use 
         return $response->withJson($result);
 });
 
+$app->post('/notification',function($request, $response, $args) use ($app) {   
+        $result = verifyRequiredParams(array('notificaton_content','notification_type'));   
+        if($result == null){
+                $db = new DbHandler();
+                $notificaton_content = $request->getParam('notificaton_content');
+                $notification_type = $request->getParam('notification_type');
+                $result = $db->notification($notificaton_content,$notification_type);
+        }
+        return $response->withJson($result);
+});
+
+$app->post('/verifySubAdmin',function($request, $response, $args) use ($app) {   
+        $result = verifyRequiredParams(array('notificaton_id','subAdmin_id'));   
+        if($result == null){
+                $db = new DbHandler();
+                $notificaton_id = $request->getParam('notificaton_id');
+                $subAdmin_id = $request->getParam('subAdmin_id');
+                $result = $db->verifySubAdmin($notificaton_id,$subAdmin_id);
+        }
+        return $response->withJson($result);
+});
+
 $app->get('/fetchAdminDetails',function($request, $response, $args) use ($app) {      
         $db = new DbHandler();
         $result = $db->fetchAdminDetails();
         return $response->withJson($result);
 });
 
+$app->get('/fetchUnseenNotification',function($request, $response, $args) use ($app) {      
+        $db = new DbHandler();
+        $result = $db->fetchUnseenNotification();
+        return $response->withJson($result);
+});
+
+$app->get('/fetchSubadmin',function($request, $response, $args) use ($app) {      
+        $db = new DbHandler();
+        $result = $db->fetchSubadmin();
+        return $response->withJson($result);
+});
+
+$app->get('/getNotificationCount',function($request, $response, $args) use ($app) {      
+        $db = new DbHandler();
+        $result = $db->getNotificationCount();
+        return $response->withJson($result);
+});
+
+$app->get('/updateIsRead',function($request, $response, $args) use ($app) {      
+        $db = new DbHandler();
+        $result = $db->updateIsRead();
+        return $response->withJson($result);
+});
+
+$app->post('/assignRoles',function($request, $response, $args) use ($app) {   
+        $result = verifyRequiredParams(array('subAdmin_id','pro_add','pro_up','pro_del','cat_add','cat_upp','cat_del','cou_add','cou_upp','cou_del','block_feed','unblock_feed'));   
+        if($result == null){
+                $db = new DbHandler();
+                $subAdmin_id = $request->getParam('subAdmin_id');
+                $pro_add = $request->getParam('pro_add');
+                $pro_up = $request->getParam('pro_up');
+                $pro_del = $request->getParam('pro_del');
+                $cat_add = $request->getParam('cat_add');
+                $cat_upp = $request->getParam('cat_upp');
+                $cat_del = $request->getParam('cat_del');
+                $cou_add = $request->getParam('cou_add');
+                $cou_upp = $request->getParam('cou_upp');
+                $cou_del = $request->getParam('cou_del');
+                $block_feed = $request->getParam('block_feed');
+                $unblock_feed = $request->getParam('unblock_feed');
+                $result = $db->assignRoles($subAdmin_id,$pro_add,$pro_up,$pro_del,$cat_add,$cat_upp,$cat_del,$cou_add,$cou_upp,$cou_del,$block_feed,$unblock_feed);
+        }
+        return $response->withJson($result);
+});
 $app->run();
 ?>

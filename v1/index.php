@@ -56,16 +56,12 @@ $app->get('/getAllUserList',function($request, $response, $args) use ($app) {
 });
 
 $app->post('/addCategory',function($request, $response, $args) use ($app) {   
-        $result = verifyRequiredParams(array('category_name','description','adminID','category_type','season_information','nutritional_information','storage_description','quantity'));   
+        $result = verifyRequiredParams(array('category_name','description','adminID','category_type'));   
         if($result == null){
                 $category_name = $request->getParam('category_name');
                 $description = $request->getParam('description');
                 $adminID = $request->getParam('adminID');
                 $category_type = $request->getParam('category_type');
-                $season_information = $request->getParam('season_information');
-                $nutritional_information = $request->getParam('nutritional_information');
-                $storage_description = $request->getParam('storage_description');
-                $quantity = $request->getParam('quantity');
 
                 $is_photo_set = false;
                 $pro_image = null;
@@ -76,13 +72,13 @@ $app->post('/addCategory',function($request, $response, $args) use ($app) {
                 }
 
                 $db = new DbHandler();
-                $result = $db->addCategory($category_name,$description,$adminID,$category_type,$season_information,$nutritional_information,$storage_description,$quantity,$is_photo_set,$pro_image);
+                $result = $db->addCategory($category_name,$description,$adminID,$category_type,$is_photo_set,$pro_image);
         }
         return $response->withJson($result);
 });
 
 $app->post('/updateCategory',function($request, $response, $args) use ($app) {   
-        $result = verifyRequiredParams(array('category_id','category_name','description','adminID','category_type','season_info','nutritional_information','storage_desc','quantity'));   
+        $result = verifyRequiredParams(array('category_id','category_name','description','adminID','category_type'));   
         if($result == null){
                 $db = new DbHandler();
                 $category_id = $request->getParam('category_id');
@@ -90,10 +86,6 @@ $app->post('/updateCategory',function($request, $response, $args) use ($app) {
                 $description = $request->getParam('description');
                 $adminID = $request->getParam('adminID');
                 $category_type = $request->getParam('category_type');
-                $season_info = $request->getParam('season_info');
-                $nutritional_information = $request->getParam('nutritional_information');
-                $storage_desc = $request->getParam('storage_desc');
-                $quantity = $request->getParam('quantity');
                 
                 $is_photo_set = false;
                 $pro_image = null;
@@ -103,7 +95,7 @@ $app->post('/updateCategory',function($request, $response, $args) use ($app) {
                         $pro_image = $_FILES['pro_image'];
                 }
                 $db = new DbHandler();
-                $result = $db->updateCategory($category_id,$category_name,$description,$adminID,$category_type,$season_info,$nutritional_information,$storage_desc,$quantity,$is_photo_set,$pro_image);
+                $result = $db->updateCategory($category_id,$category_name,$description,$adminID,$category_type,$is_photo_set,$pro_image);
         }
         return $response->withJson($result);
 });
@@ -371,50 +363,40 @@ $app->post('/removeFromCart',function($request, $response, $args) use ($app) {
 });
 
 $app->post('/addCoupon',function($request, $response, $args) use ($app) {   
-        $result = verifyRequiredParams(array('coupon_code','purchase_amount','offer_price','category_id','product_id','coupon_type','coupon_status','expire_date','is_used','admin_id','min_purchase_amount','max_discount_amount','usage_count','usage_limit','user_restrictions','instructions'));   
+        $result = verifyRequiredParams(array('coupon_code','purchase_amount','offer_price','coupon_status','expire_date','is_used','admin_id','min_purchase_amount','max_discount_amount','user_restrictions','instructions'));   
         if($result == null){
                 $db = new DbHandler();
                 $coupon_code = $request->getParam('coupon_code');
                 $purchase_amount = $request->getParam('purchase_amount');
                 $offer_price = $request->getParam('offer_price');
-                $category_id = $request->getParam('category_id');
-                $product_id = $request->getParam('product_id');
-                $coupon_type = $request->getParam('coupon_type');
                 $coupon_status = $request->getParam('coupon_status');
                 $expire_date = $request->getParam('expire_date');
                 $is_used = $request->getParam('is_used');
                 $admin_id = $request->getParam('admin_id');
                 $min_purchase_amount = $request->getParam('min_purchase_amount');
                 $max_discount_amount = $request->getParam('max_discount_amount');
-                $usage_count = $request->getParam('usage_count');
-                $usage_limit = $request->getParam('usage_limit');
                 $user_restrictions = $request->getParam('user_restrictions');
                 $instructions = $request->getParam('instructions');
-                $result = $db->addCoupon($coupon_code,$purchase_amount,$offer_price,$category_id,$product_id,$coupon_type,$coupon_status,$expire_date,$is_used,$admin_id,$min_purchase_amount,$max_discount_amount,$usage_count,$usage_limit,$user_restrictions,$instructions);
+                $result = $db->addCoupon($coupon_code, $purchase_amount, $offer_price, $coupon_status, $expire_date, $is_used, $admin_id, $min_purchase_amount, $max_discount_amount, $user_restrictions, $instructions);
         }
         return $response->withJson($result);
 });
 
 $app->post('/updateCoupon',function($request, $response, $args) use ($app) {   
-        $result = verifyRequiredParams(array('coupon_id','purchase_amount','offer_price','category_id','product_id','coupon_type','coupon_status','expire_date','admin_id','min_purchase_amount','max_discount_amount','usage_count','usage_limit','user_restrictions','instructions'));   
+        $result = verifyRequiredParams(array('coupon_id','purchase_amount','offer_price','coupon_status','expire_date','admin_id','min_purchase_amount','max_discount_amount','user_restrictions','instructions'));   
         if($result == null){
                 $db = new DbHandler();
                 $coupon_id = $request->getParam('coupon_id');
                 $purchase_amount = $request->getParam('purchase_amount');
                 $offer_price = $request->getParam('offer_price');
-                $category_id = $request->getParam('category_id');
-                $product_id = $request->getParam('product_id');
-                $coupon_type = $request->getParam('coupon_type');
                 $coupon_status = $request->getParam('coupon_status');
                 $expire_date = $request->getParam('expire_date');
                 $admin_id = $request->getParam('admin_id');
                 $min_purchase_amount = $request->getParam('min_purchase_amount');
                 $max_discount_amount = $request->getParam('max_discount_amount');
-                $usage_count = $request->getParam('usage_count');
-                $usage_limit = $request->getParam('usage_limit');
                 $user_restrictions = $request->getParam('user_restrictions');
                 $instructions = $request->getParam('instructions');
-                $result = $db->updateCoupon($coupon_id,$purchase_amount, $offer_price,$category_id,$product_id,$coupon_type,$coupon_status,$expire_date,$admin_id,$min_purchase_amount,$max_discount_amount,$usage_count,$usage_limit,$user_restrictions,$instructions);
+                $result = $db->updateCoupon($coupon_id, $purchase_amount, $offer_price,$coupon_status, $expire_date, $admin_id, $min_purchase_amount, $max_discount_amount, $user_restrictions, $instructions);
         }
         return $response->withJson($result);
 });
@@ -425,6 +407,16 @@ $app->post('/deleteCoupon',function($request, $response, $args) use ($app) {
                 $db = new DbHandler();
                 $coupon_id = $request->getParam('coupon_id');
                 $result = $db->deleteCoupon($coupon_id);
+        }
+        return $response->withJson($result);
+});
+
+$app->post('/applyCoupon',function($request, $response, $args) use ($app) {   
+        $result = verifyRequiredParams(array('coupon_id'));   
+        if($result == null){
+                $db = new DbHandler();
+                $coupon_id = $request->getParam('coupon_id');
+                $result = $db->applyCoupon($coupon_id);
         }
         return $response->withJson($result);
 });
@@ -526,33 +518,20 @@ $app->post('/removeFromFavourite',function($request, $response, $args) use ($app
 });
 
 $app->post('/placeOrder',function($request, $response, $args) use ($app) {   
-        $result = verifyRequiredParams(array('user_id','pro_id','pro_name','pro_price','pro_qty','order_status','shipping_address','payment_method','total_cost','discount_amount','shipping_cost','billing_address','delivery_date_time','pickup_date','pickup_time','gift_order_id','gift_message','payment_status','payment_date_time','refund_status','refund_amount','return_status'));   
+        $result = verifyRequiredParams(array('user_id','pro_id','pro_price','pro_qty','shipping_address','payment_method','total_cost','discount_amount','shipping_cost'));   
         if($result == null){
                 $db = new DbHandler();
                 $user_id = $request->getParam('user_id');
                 $pro_id = $request->getParam('pro_id');
-                $pro_name = $request->getParam('pro_name');
                 $pro_price = $request->getParam('pro_price');
                 $pro_qty = $request->getParam('pro_qty');
-                $order_status = $request->getParam('order_status');
                 $shipping_address = $request->getParam('shipping_address');
                 $payment_method = $request->getParam('payment_method');
                 $total_cost = $request->getParam('total_cost');
                 $discount_amount = $request->getParam('discount_amount');
                 $shipping_cost = $request->getParam('shipping_cost');
-                $billing_address = $request->getParam('billing_address');
-                $delivery_date_time = $request->getParam('delivery_date_time');
-                $pickup_date = $request->getParam('pickup_date');
-                $pickup_time = $request->getParam('pickup_time');
-                $gift_order_id = $request->getParam('gift_order_id');
-                $gift_message = $request->getParam('gift_message');
-                $payment_status = $request->getParam('payment_status');
-                $payment_date_time = $request->getParam('payment_date_time');
-                $refund_status = $request->getParam('refund_status');
-                $refund_amount = $request->getParam('refund_amount');
-                $return_status = $request->getParam('return_status');
 
-                $result = $db->placeOrder($user_id, $pro_id,$pro_name,$pro_price,$pro_qty,$order_status,$shipping_address,$payment_method,$total_cost,$discount_amount,$shipping_cost,$billing_address,$delivery_date_time,$pickup_date,$pickup_time,$gift_order_id,$gift_message,$payment_status,$payment_date_time,$refund_status,$refund_amount,$return_status);
+                $result = $db->placeOrder($user_id, $pro_id, $pro_price, $pro_qty,$shipping_address, $payment_method, $total_cost, $discount_amount, $shipping_cost);
         }
         return $response->withJson($result);
 });
@@ -573,9 +552,15 @@ $app->post('/fetchSingleCoupon',function($request, $response, $args) use ($app) 
         return $response->withJson($result);
 });
 
-$app->get('/fatchAllOrders',function($request, $response, $args) use ($app) {      
+$app->get('/fetchAllOrders',function($request, $response, $args) use ($app) {      
         $db = new DbHandler();
-        $result = $db->fatchAllOrders();
+        $result = $db->fetchAllOrders();
+        return $response->withJson($result);
+});
+
+$app->get('/fetchPendingOrder',function($request, $response, $args) use ($app) {      
+        $db = new DbHandler();
+        $result = $db->fetchPendingOrder();
         return $response->withJson($result);
 });
 
@@ -667,9 +652,77 @@ $app->post('/verifySubAdmin',function($request, $response, $args) use ($app) {
         return $response->withJson($result);
 });
 
+$app->post('/blockOrderByAdmin',function($request, $response, $args) use ($app) {   
+        $result = verifyRequiredParams(array('order_id'));   
+        if($result == null){
+                $db = new DbHandler();
+                $order_id = $request->getParam('order_id');
+                $result = $db->blockOrderByAdmin($order_id);
+        }
+        return $response->withJson($result);
+});
+
+$app->post('/fatchOrder',function($request, $response, $args) use ($app) {   
+        $result = verifyRequiredParams(array('order_id'));   
+        if($result == null){
+                $db = new DbHandler();
+                $order_id = $request->getParam('order_id');
+                $result = $db->fatchOrder($order_id);
+        }
+        return $response->withJson($result);
+});
+
+$app->post('/fetchSubadminRole',function($request, $response, $args) use ($app) {   
+        $result = verifyRequiredParams(array('order_id'));   
+        if($result == null){
+                $db = new DbHandler();
+                $order_id = $request->getParam('order_id');
+                $result = $db->fetchSubadminRole($order_id);
+        }
+        return $response->withJson($result);
+});
+
+$app->post('/updateOrderStatus',function($request, $response, $args) use ($app) {   
+        $result = verifyRequiredParams(array('order_id','order_status'));   
+        if($result == null){
+                $db = new DbHandler();
+                $order_id = $request->getParam('order_id');
+                $order_status = $request->getParam('order_status');
+                $result = $db->updateOrderStatus($order_id,$order_status);
+        }
+        return $response->withJson($result);
+});
+
+$app->post('/verifyOrder',function($request, $response, $args) use ($app) {   
+        $result = verifyRequiredParams(array('order_id','delivery_date'));   
+        if($result == null){
+                $db = new DbHandler();
+                $order_id = $request->getParam('order_id');
+                $delivery_date = $request->getParam('delivery_date');
+                $result = $db->verifyOrder($order_id,$delivery_date);
+        }
+        return $response->withJson($result);
+});
+
+$app->post('/subadminLogin',function($request, $response, $args) use ($app) {   
+        $result = verifyRequiredParams(array('subadmin_id'));   
+        if($result == null){
+                $db = new DbHandler();
+                $subAdmin_id = $request->getParam('subadmin_id');
+                $result = $db->subadminLogin($subAdmin_id);
+        }
+        return $response->withJson($result);
+});
+
 $app->get('/fetchAdminDetails',function($request, $response, $args) use ($app) {      
         $db = new DbHandler();
         $result = $db->fetchAdminDetails();
+        return $response->withJson($result);
+});
+
+$app->get('/fetchAllBlockOrder',function($request, $response, $args) use ($app) {      
+        $db = new DbHandler();
+        $result = $db->fetchAllBlockOrder();
         return $response->withJson($result);
 });
 

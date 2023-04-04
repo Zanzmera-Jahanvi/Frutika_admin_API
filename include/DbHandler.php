@@ -367,7 +367,7 @@ class DbHandler
         }
         return $result;
     }
-    // updateIsRead
+
     public function updateIsRead()
     {
 
@@ -429,6 +429,102 @@ class DbHandler
         }
         return $result;
     }
+    
+    public function verifyOrder($order_id, $delivery_date)
+    {
+
+        $sql_query = "CALL verifyOrder(?,?,@is_done)";
+        $stmt = $this->conn->prepare($sql_query);
+        $stmt->bind_param('is', $order_id, $delivery_date);
+        $stmt->execute();
+        $stmt->close();
+
+        $stmt1 = $this->conn->prepare("SELECT @is_done AS is_done");
+        $stmt1->execute();
+        $stmt1->bind_result($is_done);
+        $stmt1->fetch();
+        $stmt1->close();
+
+        if ($is_done) {
+            $result = array(
+                'success' => true,
+                'Message' => "Order verified Successfully",
+                'Status' => "Success"
+            );
+        } else {
+            $result = array(
+                'success' => false,
+                'Message' => "Failed to verified Order . Internal server error",
+                'Status' => "Error"
+            );
+        }
+        return $result;
+    }
+    
+    public function subadminLogin($admin_id)
+    {
+        $sql_query = "CALL subadminLogin(?)";
+        $stmt = $this->conn->prepare($sql_query);
+        $stmt->bind_param('i', $admin_id);
+        $stmt->execute();
+
+        $res = $stmt->get_result();
+        $response = array();
+
+        while ($record = $res->fetch_assoc()) {
+            $response = $record;
+        }
+
+        $stmt->close();
+
+        if (count($response) > 0) {
+            $result = array(
+                'success' => true,
+                'Message' => "You have been verified by the admin",
+                'Status' => "Success",
+                'Response' => $response,
+            );
+        } else {
+            $result = array(
+                'success' => false,
+                'Message' => "ooops admin verification is pending. Internal server error",
+                'Status' => "Error"
+            );
+        }
+        return $result;
+    }
+
+    public function blockOrderByAdmin($order_id)
+    {
+
+        $sql_query = "CALL blockOrderByAdmin(?,@is_done)";
+        $stmt = $this->conn->prepare($sql_query);
+        $stmt->bind_param('i', $order_id);
+        $stmt->execute();
+        $stmt->close();
+
+        $stmt1 = $this->conn->prepare("SELECT @is_done AS is_done");
+        $stmt1->execute();
+        $stmt1->bind_result($is_done);
+        $stmt1->fetch();
+        $stmt1->close();
+
+        if ($is_done) {
+            $result = array(
+                'success' => true,
+                'Message' => "Order Blocked successfully",
+                'Status' => "Success"
+            );
+        } else {
+            $result = array(
+                'success' => false,
+                'Message' => "Failed to block order . Internal server error",
+                'Status' => "Error"
+            );
+        }
+        return $result;
+    }
+    
     //  ================   Fatch/Search API's    ==============================
     public function getAllUserList()
     {
@@ -774,9 +870,38 @@ class DbHandler
         return $result;
     }
 
-    public function fatchAllOrders()
+    public function fetchAllOrders()
     {
-        $sql_query = "CALL fatchAllOrders()";
+        $sql_query = "CALL fetchAllOrders()";
+        $stmt = $this->conn->query($sql_query);
+        $this->conn->next_result();
+        $response = array();
+        while ($row = $stmt->fetch_assoc()) {
+            $response[] = $row;
+        }
+
+        $stmt->close();
+
+        if (count($response) > 0) {
+            $result = array(
+                'success' => true,
+                'Message' => "Order fetched successfully",
+                'Status' => "Success",
+                'Response' => $response
+            );
+        } else {
+            $result = array(
+                'success' => false,
+                'Message' => "Failed to fetch order. Internal server error",
+                'Status' => "Error"
+            );
+        }
+        return $result;
+    }
+
+    public function fetchPendingOrder()
+    {
+        $sql_query = "CALL fetchPendingOrder()";
         $stmt = $this->conn->query($sql_query);
         $this->conn->next_result();
         $response = array();
@@ -956,14 +1081,108 @@ class DbHandler
         return $result;
     }
 
+    public function fetchAllBlockOrder()
+    {
+        $sql_query = "CALL fetchAllBlockOrder()";
+        $stmt = $this->conn->query($sql_query);
+        $this->conn->next_result();
+        $response = array();
+        while ($row = $stmt->fetch_assoc()) {
+            $response[] = $row;
+        }
+
+        $stmt->close();
+
+        if (count($response) > 0) {
+            $result = array(
+                'success' => true,
+                'Message' => "Block order Details fetched successfully",
+                'Status' => "Success",
+                'Response' => $response
+            );
+        } else {
+            $result = array(
+                'success' => false,
+                'Message' => "Failed to fetch order Details. Internal server error",
+                'Status' => "Error"
+            );
+        }
+        return $result;
+    }
+
+    public function fatchOrder($order_id)
+    {
+        $sql_query = "CALL fatchOrder(?)";
+        $stmt = $this->conn->prepare($sql_query);
+        $stmt->bind_param('i', $order_id);
+        $stmt->execute();
+
+        $res = $stmt->get_result();
+        $response = array();
+
+        while ($record = $res->fetch_assoc()) {
+            $response = $record;
+        }
+
+        $stmt->close();
+
+        if (count($response) > 0) {
+            $result = array(
+                'success' => true,
+                'Message' => "Order fetched successfully",
+                'Status' => "Success",
+                'Response' => $response,
+            );
+        } else {
+            $result = array(
+                'success' => false,
+                'Message' => "Failed to fetch order. Internal server error",
+                'Status' => "Error"
+            );
+        }
+        return $result;
+    }
+    public function fetchSubadminRole($order_id)
+    {
+        $sql_query = "CALL fetchSubadminRole(?)";
+        $stmt = $this->conn->prepare($sql_query);
+        $stmt->bind_param('i', $order_id);
+        $stmt->execute();
+
+        $res = $stmt->get_result();
+        $response = array();
+
+        while ($record = $res->fetch_assoc()) {
+            $response = $record;
+        }
+
+        $stmt->close();
+
+        if (count($response) > 0) {
+            $result = array(
+                'success' => true,
+                'Message' => "subadmin Role fetched successfully",
+                'Status' => "Success",
+                'Response' => $response,
+            );
+        } else {
+            $result = array(
+                'success' => false,
+                'Message' => "Failed to fetch subadmin Role. Internal server error",
+                'Status' => "Error"
+            );
+        }
+        return $result;
+    }
+    
 
     // ================   CATEGORY    ==============================
 
-    public function addCategory($cat_name, $cat_desc, $cat_creator_id, $cat_type, $season_info, $nutritional_information, $storage_desc, $quantity, $is_photo_set, $pro_image)
+    public function addCategory($cat_name, $cat_desc, $cat_creator_id, $cat_type, $is_photo_set, $pro_image)
     {
-        $sql_query = "CALL addCategory(?,?,?,?,?,?,?,?,@is_done,@last_cat_id)";
+        $sql_query = "CALL addCategory(?,?,?,?,@is_done,@last_cat_id)";
         $stmt = $this->conn->prepare($sql_query);
-        $stmt->bind_param('ssissssi', $cat_name, $cat_desc, $cat_creator_id, $cat_type, $season_info, $nutritional_information, $storage_desc, $quantity);
+        $stmt->bind_param('ssis', $cat_name, $cat_desc, $cat_creator_id, $cat_type);
         $stmt->execute();
         $stmt->close();
 
@@ -1008,12 +1227,12 @@ class DbHandler
         }
     }
 
-    public function updateCategory($cat_id, $cat_name, $cat_desc, $cat_creator_id, $cat_type, $season_info, $nutritional_information, $storage_desc, $quantity, $is_photo_set, $pro_image)
+    public function updateCategory($cat_id, $cat_name, $cat_desc, $cat_creator_id, $cat_type, $is_photo_set, $pro_image)
     {
 
-        $sql_query = "CALL updateCategory(?,?,?,?,?,?,?,?,?,@is_done)";
+        $sql_query = "CALL updateCategory(?,?,?,?,?,@is_done)";
         $stmt = $this->conn->prepare($sql_query);
-        $stmt->bind_param('ississssi', $cat_id, $cat_name, $cat_desc, $cat_creator_id, $cat_type, $season_info, $nutritional_information, $storage_desc, $quantity);
+        $stmt->bind_param('issis', $cat_id, $cat_name, $cat_desc, $cat_creator_id, $cat_type);
         $stmt->execute();
         $stmt->close();
 
@@ -1225,11 +1444,11 @@ class DbHandler
 
     // ================  Coupon    ==============================
 
-    public function addCoupon($coupon_code, $purchase_amount, $offer_price, $category_id, $product_id, $coupon_type, $coupon_status, $expire_date, $is_used, $admin_id, $min_purchase_amount, $max_discount_amount, $usage_count, $usage_limit, $user_restrictions, $instructions)
+    public function addCoupon($coupon_code, $purchase_amount, $offer_price, $coupon_status, $expire_date, $is_used, $admin_id, $min_purchase_amount, $max_discount_amount, $user_restrictions, $instructions)
     {
-        $sql_query = "CALL addCoupon(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,@is_done,@last_coupon_code)";
+        $sql_query = "CALL addCoupon(?,?,?,?,?,?,?,?,?,?,?,@is_done,@last_coupon_code)";
         $stmt = $this->conn->prepare($sql_query);
-        $stmt->bind_param('siiiisisiiiiiiss', $coupon_code, $purchase_amount, $offer_price, $category_id, $product_id, $coupon_type, $coupon_status, $expire_date, $is_used, $admin_id, $min_purchase_amount, $max_discount_amount, $usage_count, $usage_limit, $user_restrictions, $instructions);
+        $stmt->bind_param('siiisiiiiss', $coupon_code, $purchase_amount, $offer_price, $coupon_status, $expire_date, $is_used, $admin_id, $min_purchase_amount, $max_discount_amount, $user_restrictions, $instructions);
         $stmt->execute();
         $stmt->close();
 
@@ -1255,12 +1474,12 @@ class DbHandler
         return $result;
     }
 
-    public function updateCoupon($coupon_id, $purchase_amount, $offer_price, $category_id, $product_id, $coupon_type, $coupon_status, $expire_date, $admin_id, $min_purchase_amount, $max_discount_amount, $usage_count, $usage_limit, $user_restrictions, $instructions)
+    public function updateCoupon($coupon_id, $purchase_amount, $offer_price, $coupon_status, $expire_date, $admin_id, $min_purchase_amount, $max_discount_amount, $user_restrictions, $instructions)
     {
 
-        $sql_query = "CALL updateCoupon(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,@is_done)";
+        $sql_query = "CALL updateCoupon(?,?,?,?,?,?,?,?,?,?,@is_done)";
         $stmt = $this->conn->prepare($sql_query);
-        $stmt->bind_param('iiiiisisiiiiiss', $coupon_id, $purchase_amount, $offer_price, $category_id, $product_id, $coupon_type, $coupon_status, $expire_date, $admin_id, $min_purchase_amount, $max_discount_amount, $usage_count, $usage_limit, $user_restrictions, $instructions);
+        $stmt->bind_param('iiiisiiiss', $coupon_id, $purchase_amount, $offer_price,$coupon_status, $expire_date, $admin_id, $min_purchase_amount, $max_discount_amount, $user_restrictions, $instructions);
         $stmt->execute();
         $stmt->close();
 
@@ -1310,6 +1529,36 @@ class DbHandler
             $result = array(
                 'success' => false,
                 'Message' => "Failed to Delete Coupon . Internal server error",
+                'Status' => "Error"
+            );
+        }
+        return $result;
+    }
+
+    public function applyCoupon($coupon_id)
+    {
+        $sql_query = "CALL applyCoupon(?,@is_done)";
+        $stmt = $this->conn->prepare($sql_query);
+        $stmt->bind_param('i', $coupon_id);
+        $stmt->execute();
+        $stmt->close();
+
+        $stmt1 = $this->conn->prepare("SELECT @is_done AS is_done");
+        $stmt1->execute();
+        $stmt1->bind_result($is_done);
+        $stmt1->fetch();
+        $stmt1->close();
+
+        if ($is_done) {
+            $result = array(
+                'success' => true,
+                'Message' => "Coupon Apply successfully",
+                'Status' => "Success"
+            );
+        } else {
+            $result = array(
+                'success' => false,
+                'Message' => "Failed to Apply Coupon . Internal server error",
                 'Status' => "Error"
             );
         }
@@ -1750,11 +1999,11 @@ class DbHandler
         return $result;
     }
 
-    public function placeOrder($user_id, $pro_id, $pro_name, $pro_price, $pro_qty, $order_status, $shipping_address, $payment_method, $total_cost, $discount_amount, $shipping_cost, $billing_address, $delivery_date_time, $pickup_date, $pickup_time, $gift_order_id, $gift_message, $payment_status, $payment_date_time, $refund_status, $refund_amount, $return_status)
+    public function placeOrder($user_id, $pro_id, $pro_price, $pro_qty,$shipping_address, $payment_method, $total_cost, $discount_amount, $shipping_cost )
     {
-        $sql_query = "CALL placeOrder(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,@is_done,@last_order_id)";
+        $sql_query = "CALL placeOrder(?,?,?,?,?,?,?,?,?,@is_done,@last_order_id)";
         $stmt = $this->conn->prepare($sql_query);
-        $stmt->bind_param('iisiisssiiissssissssis', $user_id, $pro_id, $pro_name, $pro_price, $pro_qty, $order_status, $shipping_address, $payment_method, $total_cost, $discount_amount, $shipping_cost, $billing_address, $delivery_date_time, $pickup_date, $pickup_time, $gift_order_id, $gift_message, $payment_status, $payment_date_time, $refund_status, $refund_amount, $return_status);
+        $stmt->bind_param('iiiissiii', $user_id, $pro_id, $pro_price, $pro_qty, $shipping_address, $payment_method, $total_cost, $discount_amount, $shipping_cost);
         $stmt->execute();
         $stmt->close();
 
@@ -1774,6 +2023,37 @@ class DbHandler
             $result = array(
                 'success' => false,
                 'Message' => "Failed to Place Order . Internal server error",
+                'Status' => "Error"
+            );
+        }
+        return $result;
+    }
+
+    public function updateOrderStatus($order_id, $order_status)
+    {
+
+        $sql_query = "CALL updateOrderStatus(?,?,@is_done)";
+        $stmt = $this->conn->prepare($sql_query);
+        $stmt->bind_param('is', $order_id, $order_status);
+        $stmt->execute();
+        $stmt->close();
+
+        $stmt1 = $this->conn->prepare("SELECT @is_done AS is_done");
+        $stmt1->execute();
+        $stmt1->bind_result($is_done);
+        $stmt1->fetch();
+        $stmt1->close();
+
+        if ($is_done) {
+            $result = array(
+                'success' => true,
+                'Message' => "Order status updated successfully",
+                'Status' => "Success"
+            );
+        } else {
+            $result = array(
+                'success' => false,
+                'Message' => "Failed to update Order status . Internal server error",
                 'Status' => "Error"
             );
         }

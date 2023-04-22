@@ -129,14 +129,16 @@ $app->post('/addProduct',function($request, $response, $args) use ($app) {
 
                 $is_photo_set = false;
                 $pro_image = null;
-
+                $pro_video = null;
+                // var_dump($_FILES);
                 if (isset($_FILES['pro_image'])) {
                         $is_photo_set = true;
                         $pro_image = $_FILES['pro_image'];
+                        $pro_video = $_FILES['pro_video'];
                 }
 
                 $db = new DbHandler();
-                $result = $db->addProduct($product_name,$description,$product_price,$pro_qty,$cate_id,$adminID,$nutrition_information,$origin,$season,$weight,$storage_instrustion,$best_before_date,$is_photo_set,$pro_image);
+                $result = $db->addProduct($product_name,$description,$product_price,$pro_qty,$cate_id,$adminID,$nutrition_information,$origin,$season,$weight,$storage_instrustion,$best_before_date,$is_photo_set,$pro_image,$pro_video);
         }
         return $response->withJson($result);
 });
@@ -720,6 +722,12 @@ $app->get('/fetchAdminDetails',function($request, $response, $args) use ($app) {
         return $response->withJson($result);
 });
 
+$app->get('/fetchallSubadmin',function($request, $response, $args) use ($app) {      
+        $db = new DbHandler();
+        $result = $db->fetchallSubadmin();
+        return $response->withJson($result);
+});
+
 $app->get('/fetchAllBlockOrder',function($request, $response, $args) use ($app) {      
         $db = new DbHandler();
         $result = $db->fetchAllBlockOrder();
@@ -729,6 +737,26 @@ $app->get('/fetchAllBlockOrder',function($request, $response, $args) use ($app) 
 $app->get('/fetchUnseenNotification',function($request, $response, $args) use ($app) {      
         $db = new DbHandler();
         $result = $db->fetchUnseenNotification();
+        return $response->withJson($result);
+});
+
+$app->post('/print_invoice',function($request, $response, $args) use ($app) {   
+        $result = verifyRequiredParams(array('order_id'));   
+        if($result == null){
+                $db = new DbHandler();
+                $order_id = $request->getParam('order_id');
+                $result = $db->print_invoice($order_id);
+        }
+        return $response->withJson($result);
+});
+
+$app->post('/delete_subadmin',function($request, $response, $args) use ($app) {   
+        $result = verifyRequiredParams(array('subadmin_id'));   
+        if($result == null){
+                $db = new DbHandler();
+                $subadmin_id = $request->getParam('subadmin_id');
+                $result = $db->delete_subadmin($subadmin_id);
+        }
         return $response->withJson($result);
 });
 
@@ -768,6 +796,61 @@ $app->post('/assignRoles',function($request, $response, $args) use ($app) {
                 $unblock_feed = $request->getParam('unblock_feed');
                 $result = $db->assignRoles($subAdmin_id,$pro_add,$pro_up,$pro_del,$cat_add,$cat_upp,$cat_del,$cou_add,$cou_upp,$cou_del,$block_feed,$unblock_feed);
         }
+        return $response->withJson($result);
+});
+$app->post('/edit_sub_admin_roles',function($request, $response, $args) use ($app) {   
+        $result = verifyRequiredParams(array('subAdmin_id','pro_add','pro_up','pro_del','cat_add','cat_upp','cat_del','cou_add','cou_upp','cou_del','block_feed','unblock_feed'));   
+        if($result == null){
+                $db = new DbHandler();
+                $subAdmin_id = $request->getParam('subAdmin_id');
+                $pro_add = $request->getParam('pro_add');
+                $pro_up = $request->getParam('pro_up');
+                $pro_del = $request->getParam('pro_del');
+                $cat_add = $request->getParam('cat_add');
+                $cat_upp = $request->getParam('cat_upp');
+                $cat_del = $request->getParam('cat_del');
+                $cou_add = $request->getParam('cou_add');
+                $cou_upp = $request->getParam('cou_upp');
+                $cou_del = $request->getParam('cou_del');
+                $block_feed = $request->getParam('block_feed');
+                $unblock_feed = $request->getParam('unblock_feed');
+                $result = $db->edit_sub_admin_roles($subAdmin_id,$pro_add,$pro_up,$pro_del,$cat_add,$cat_upp,$cat_del,$cou_add,$cou_upp,$cou_del,$block_feed,$unblock_feed);
+        }
+        return $response->withJson($result);
+});
+
+$app->get('/category_count',function($request, $response, $args) use ($app) {      
+        $db = new DbHandler();
+        $result = $db->category_count();
+        return $response->withJson($result);
+});
+
+$app->get('/active_count_count',function($request, $response, $args) use ($app) {      
+        $db = new DbHandler();
+        $result = $db->active_count_count();
+        return $response->withJson($result);
+});
+
+$app->get('/product_count',function($request, $response, $args) use ($app) {      
+        $db = new DbHandler();
+        $result = $db->product_count();
+        return $response->withJson($result);
+});
+$app->get('/total_feedback_count',function($request, $response, $args) use ($app) {      
+        $db = new DbHandler();
+        $result = $db->total_feedback_count();
+        return $response->withJson($result);
+});
+
+$app->get('/total_user_count',function($request, $response, $args) use ($app) {      
+        $db = new DbHandler();
+        $result = $db->total_user_count();
+        return $response->withJson($result);
+});
+
+$app->get('/total_subuser_count',function($request, $response, $args) use ($app) {      
+        $db = new DbHandler();
+        $result = $db->total_subuser_count();
         return $response->withJson($result);
 });
 $app->run();

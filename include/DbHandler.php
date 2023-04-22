@@ -102,9 +102,9 @@ class DbHandler
 
     public function adminChangePassword($admin_id, $password)
     {
-        if ($password != "") {
-            $password = md5($password);
-        }
+        // if ($password != "") {
+        //     $password = md5($password);
+        // }
 
         $sql_query = "CALL adminChangePassword(?,?,@is_done)";
         $stmt = $this->conn->prepare($sql_query);
@@ -156,19 +156,20 @@ class DbHandler
                 $extension = pathinfo($pro_image['name'], PATHINFO_EXTENSION);
                 $user_name_trimmed = trim($user_name);
                 $filename = time() . '_' . str_replace(' ', '', $user_name_trimmed) . '_img.' . $extension;
+                echo $filename;
                 $file = $this->image_path . $filename;
                 if (move_uploaded_file($pro_image['tmp_name'], $file)) {
                     $stmt2 = $this->conn->query("UPDATE tbl_admin SET profile_image = '$filename' WHERE admin_id = $last_user_id");
                     $result = array(
                         'success' => true,
-                        'Message' => "Profile Updated successfully",
+                        'Message' => "sub admin created successfully",
                         'sub_admin_id' => $last_user_id,
                         'Status' => "Success"
                     );
                 } else {
                     $result = array(
                         'success' => true,
-                        'Message' => 'Profile Updated successfully . but images are not uploaded due to some issues',
+                        'Message' => 'sub admin created successfully  . but images are not uploaded due to some issues',
                         'sub_admin_id' => $last_user_id,
                         'Status' => "Success"
                     );
@@ -176,7 +177,7 @@ class DbHandler
             } else {
                 $result = array(
                     'success' => true,
-                    'Message' => 'Profile added successfully',
+                    'Message' => 'Profile updated successfully',
                     'sub_admin_id' => $last_user_id,
                     'Status' => "Success"
                 );
@@ -184,18 +185,18 @@ class DbHandler
         } else {
             $result = array(
                 'success' => false,
-                'Message' => 'Failed to add Profile',
+                'Message' => 'Failed to add sub admin',
                 'Status' => "Error"
             );
         }
         return $result;
     }
 
-    public function assignRoles($admin_id,$pro_add,$pro_up,$pro_del,$cat_add,$cat_upp,$cat_del,$cou_add,$cou_upp,$cou_del,$block_feed,$unblock_feed)
+    public function assignRoles($admin_id, $pro_add, $pro_up, $pro_del, $cat_add, $cat_upp, $cat_del, $cou_add, $cou_upp, $cou_del, $block_feed, $unblock_feed)
     {
         $sql_query = "CALL assignRoles(?,?,?,?,?,?,?,?,?,?,?,?,@is_done,@last_user_id)";
         $stmt = $this->conn->prepare($sql_query);
-        $stmt->bind_param('iiiiiiiiiiii',$admin_id,$pro_add,$pro_up,$pro_del,$cat_add,$cat_upp,$cat_del,$cou_add,$cou_upp,$cou_del,$block_feed,$unblock_feed);
+        $stmt->bind_param('iiiiiiiiiiii', $admin_id, $pro_add, $pro_up, $pro_del, $cat_add, $cat_upp, $cat_del, $cou_add, $cou_upp, $cou_del, $block_feed, $unblock_feed);
         $stmt->execute();
         $stmt->close();
 
@@ -215,6 +216,36 @@ class DbHandler
             $result = array(
                 'success' => false,
                 'Message' => "Failed to add role . Internal server error",
+                'Status' => "Error"
+            );
+        }
+        return $result;
+    }
+
+    public function edit_sub_admin_roles($admin_id, $pro_add, $pro_up, $pro_del, $cat_add, $cat_upp, $cat_del, $cou_add, $cou_upp, $cou_del, $block_feed, $unblock_feed)
+    {
+        $sql_query = "CALL edit_sub_admin_roles(?,?,?,?,?,?,?,?,?,?,?,?,@is_done)";
+        $stmt = $this->conn->prepare($sql_query);
+        $stmt->bind_param('iiiiiiiiiiii', $admin_id, $pro_add, $pro_up, $pro_del, $cat_add, $cat_upp, $cat_del, $cou_add, $cou_upp, $cou_del, $block_feed, $unblock_feed);
+        $stmt->execute();
+        $stmt->close();
+
+        $stmt1 = $this->conn->prepare("SELECT @is_done AS is_done");
+        $stmt1->execute();
+        $stmt1->bind_result($is_done);
+        $stmt1->fetch();
+        $stmt1->close();
+
+        if ($is_done) {
+            $result = array(
+                'success' => true,
+                'Message' => "Role updated successfully",
+                'Status' => "Success"
+            );
+        } else {
+            $result = array(
+                'success' => false,
+                'Message' => "Failed to update role . Internal server error",
                 'Status' => "Error"
             );
         }
@@ -429,7 +460,7 @@ class DbHandler
         }
         return $result;
     }
-    
+
     public function verifyOrder($order_id, $delivery_date)
     {
 
@@ -460,7 +491,7 @@ class DbHandler
         }
         return $result;
     }
-    
+
     public function subadminLogin($admin_id)
     {
         $sql_query = "CALL subadminLogin(?)";
@@ -524,7 +555,36 @@ class DbHandler
         }
         return $result;
     }
-    
+
+    public function delete_subadmin($admin_id)
+    {
+        $sql_query = "CALL delete_subadmin(?,@is_done)";
+        $stmt = $this->conn->prepare($sql_query);
+        $stmt->bind_param('i', $admin_id);
+        $stmt->execute();
+        $stmt->close();
+
+        $stmt1 = $this->conn->prepare("SELECT @is_done AS is_done");
+        $stmt1->execute();
+        $stmt1->bind_result($is_done);
+        $stmt1->fetch();
+        $stmt1->close();
+
+        if ($is_done) {
+            $result = array(
+                'success' => true,
+                'Message' => "subadmin  Deleted Successfully",
+                'Status' => "Success"
+            );
+        } else {
+            $result = array(
+                'success' => false,
+                'Message' => "Failed to Delete subadmin . Internal server error",
+                'Status' => "Error"
+            );
+        }
+        return $result;
+    }
     //  ================   Fatch/Search API's    ==============================
     public function getAllUserList()
     {
@@ -1110,6 +1170,35 @@ class DbHandler
         return $result;
     }
 
+    public function fetchallSubadmin()
+    {
+        $sql_query = "CALL fetchallSubadmin()";
+        $stmt = $this->conn->query($sql_query);
+        $this->conn->next_result();
+        $response = array();
+        while ($row = $stmt->fetch_assoc()) {
+            $response[] = $row;
+        }
+
+        $stmt->close();
+
+        if (count($response) > 0) {
+            $result = array(
+                'success' => true,
+                'Message' => "Admin details fetched successfully",
+                'Status' => "Success",
+                'Response' => $response
+            );
+        } else {
+            $result = array(
+                'success' => false,
+                'Message' => "Failed to fetch admin Details. Internal server error",
+                'Status' => "Error"
+            );
+        }
+        return $result;
+    }
+
     public function fatchOrder($order_id)
     {
         $sql_query = "CALL fatchOrder(?)";
@@ -1174,7 +1263,206 @@ class DbHandler
         }
         return $result;
     }
-    
+
+    public function print_invoice($order_id)
+    {
+        $sql_query = "CALL print_invoice(?)";
+        $stmt = $this->conn->prepare($sql_query);
+        $stmt->bind_param('i', $order_id);
+        $stmt->execute();
+
+        $res = $stmt->get_result();
+        $response = array();
+
+        while ($record = $res->fetch_assoc()) {
+            $response = $record;
+        }
+
+        $stmt->close();
+
+        if (count($response) > 0) {
+            $result = array(
+                'success' => true,
+                'Message' => "data fetched successfully",
+                'Status' => "Success",
+                'Response' => $response,
+            );
+        } else {
+            $result = array(
+                'success' => false,
+                'Message' => "Failed to fetch data. Internal server error",
+                'Status' => "Error"
+            );
+        }
+        return $result;
+    }
+
+    public function category_count(){
+        $sql_query = "select count(*) as total_cat_count from tbl_category";
+        $stmt = $this->conn->query($sql_query);
+        $this->conn->next_result();
+        $response = array();
+        while ($row = $stmt->fetch_assoc()) {
+            $response[] = $row;
+        }
+
+        $stmt->close();
+
+        if (count($response) > 0) {
+            $result = array(
+                'success' => true,
+                'Message' => "category count fetched successfully",
+                'Status' => "Success",
+                'Response' => $response
+            );
+        } else {
+            $result = array(
+                'success' => false,
+                'Message' => "Failed to fetch category count. Internal server error",
+                'Status' => "Error"
+            );
+        }
+        return $result;
+    }
+    public function product_count(){
+        $sql_query = "select count(*) as total_product_count from tbl_product";
+        $stmt = $this->conn->query($sql_query);
+        $this->conn->next_result();
+        $response = array();
+        while ($row = $stmt->fetch_assoc()) {
+            $response[] = $row;
+        }
+
+        $stmt->close();
+
+        if (count($response) > 0) {
+            $result = array(
+                'success' => true,
+                'Message' => "product count fetched successfully",
+                'Status' => "Success",
+                'Response' => $response
+            );
+        } else {
+            $result = array(
+                'success' => false,
+                'Message' => "Failed to fetch product count. Internal server error",
+                'Status' => "Error"
+            );
+        }
+        return $result;
+    }
+
+    public function active_count_count(){
+        $sql_query = "select count(*) as total_coupon_count from tbl_coupon where is_used = 0";
+        $stmt = $this->conn->query($sql_query);
+        $this->conn->next_result();
+        $response = array();
+        while ($row = $stmt->fetch_assoc()) {
+            $response[] = $row;
+        }
+
+        $stmt->close();
+
+        if (count($response) > 0) {
+            $result = array(
+                'success' => true,
+                'Message' => "coupon count fetched successfully",
+                'Status' => "Success",
+                'Response' => $response
+            );
+        } else {
+            $result = array(
+                'success' => false,
+                'Message' => "Failed to fetch coupon count. Internal server error",
+                'Status' => "Error"
+            );
+        }
+        return $result;
+    }
+
+    public function total_feedback_count(){
+        $sql_query = "select count(*) as total_feedback_count from tbl_feedback where visible_to_public = 1";
+        $stmt = $this->conn->query($sql_query);
+        $this->conn->next_result();
+        $response = array();
+        while ($row = $stmt->fetch_assoc()) {
+            $response[] = $row;
+        }
+
+        $stmt->close();
+
+        if (count($response) > 0) {
+            $result = array(
+                'success' => true,
+                'Message' => "feedback count fetched successfully",
+                'Status' => "Success",
+                'Response' => $response
+            );
+        } else {
+            $result = array(
+                'success' => false,
+                'Message' => "Failed to fetch feedback count. Internal server error",
+                'Status' => "Error"
+            );
+        }
+        return $result;
+    }
+
+    public function total_user_count(){
+        $sql_query = "select count(*) as total_user_count from tbl_user";
+        $stmt = $this->conn->query($sql_query);
+        $this->conn->next_result();
+        $response = array();
+        while ($row = $stmt->fetch_assoc()) {
+            $response[] = $row;
+        }
+
+        $stmt->close();
+
+        if (count($response) > 0) {
+            $result = array(
+                'success' => true,
+                'Message' => "user count fetched successfully",
+                'Status' => "Success",
+                'Response' => $response
+            );
+        } else {
+            $result = array(
+                'success' => false,
+                'Message' => "Failed to fetch user count. Internal server error",
+                'Status' => "Error"
+            );
+        }
+        return $result;
+    }
+
+    public function total_subuser_count(){
+        $sql_query = "select count(*) as total_user_count from tbl_admin where is_subadmin = 1";
+        $stmt = $this->conn->query($sql_query);
+        $this->conn->next_result();
+        $response = array();
+        while ($row = $stmt->fetch_assoc()) {
+            $response[] = $row;
+        }
+
+        $stmt->close();
+
+        if (count($response) > 0) {
+            $result = array(
+                'success' => true,
+                'Message' => "user count fetched successfully",
+                'Status' => "Success",
+                'Response' => $response
+            );
+        } else {
+            $result = array(
+                'success' => false,
+                'Message' => "Failed to fetch user count. Internal server error",
+                'Status' => "Error"
+            );
+        }
+        return $result;
+    }
 
     // ================   CATEGORY    ==============================
 
@@ -1309,7 +1597,7 @@ class DbHandler
     }
 
     // ================   PRODUCT    ==============================
-    public function addProduct($pro_name, $pro_desc, $pro_price, $pro_qty, $pro_cate_id, $pro_creator_id, $nut_info, $origin_info, $season_info, $weight_info, $storage_info, $bb_date, $is_photo_set, $pro_image)
+    public function addProduct($pro_name, $pro_desc, $pro_price, $pro_qty, $pro_cate_id, $pro_creator_id, $nut_info, $origin_info, $season_info, $weight_info, $storage_info, $bb_date, $is_photo_set, $pro_image, $pro_video)
     {
 
         $sql_query = "CALL addProduct(?,?,?,?,?,?,?,?,?,?,?,?,@is_done,@last_pro_id)";
@@ -1331,12 +1619,14 @@ class DbHandler
                     mkdir($this->image_path, 0777, true);
                 }
                 $extension = pathinfo($pro_image['name'], PATHINFO_EXTENSION);
+                $vid_extension = pathinfo($pro_video['name'], PATHINFO_EXTENSION);
                 $pro_name_trimmed = trim($pro_name);
                 $filename = time() . '_' . str_replace(' ', '', $pro_name_trimmed) . '_img.' . $extension;
-                $file = $this->image_path . $filename;
-                if (move_uploaded_file($pro_image['tmp_name'], $file)) {
-
-                    $stmt2 = $this->conn->query("UPDATE tbl_product SET pro_image = '$filename' WHERE pro_id = $last_pro_id");
+                $vid_filename = time() . '_' . str_replace(' ', '', $pro_name_trimmed) . '.' . $vid_extension;
+                $image_file = $this->image_path . $filename;
+                $video_file = $this->image_path . $vid_filename; // Set the path where you want to save the video file
+                if (move_uploaded_file($pro_image['tmp_name'], $image_file) && move_uploaded_file($pro_video['tmp_name'], $video_file)) {
+                    $stmt2 = $this->conn->query("UPDATE tbl_product SET pro_image = '$filename', pro_video = '$vid_filename' WHERE pro_id = $last_pro_id");
                     $result = array(
                         'success' => true,
                         'Message' => "product added successfully",
@@ -1345,20 +1635,21 @@ class DbHandler
                 } else {
                     $result = array(
                         'success' => true,
-                        'Message' => 'product added successfully . but images are not uploaded due to some issues',
+                        'Message' => 'product added successfully. but images are not uploaded due to some issues',
                         'Status' => "Success"
                     );
                 }
             } else {
                 $result = array(
                     'success' => false,
-                    'Message' => "Failed to add product . Internal server error",
+                    'Message' => "Failed to add product. Internal server error",
                     'Status' => "Error"
                 );
             }
             return $result;
         }
     }
+
 
     public function updateProduct($prod_id, $product_name, $product_desc, $product_price, $product_qty, $pro_cate_id, $admin_id, $nut_info, $origin_info, $season_info, $weight_info, $storage_info, $bb_date, $is_photo_set, $pro_image)
     {
@@ -1479,7 +1770,7 @@ class DbHandler
 
         $sql_query = "CALL updateCoupon(?,?,?,?,?,?,?,?,?,?,@is_done)";
         $stmt = $this->conn->prepare($sql_query);
-        $stmt->bind_param('iiiisiiiss', $coupon_id, $purchase_amount, $offer_price,$coupon_status, $expire_date, $admin_id, $min_purchase_amount, $max_discount_amount, $user_restrictions, $instructions);
+        $stmt->bind_param('iiiisiiiss', $coupon_id, $purchase_amount, $offer_price, $coupon_status, $expire_date, $admin_id, $min_purchase_amount, $max_discount_amount, $user_restrictions, $instructions);
         $stmt->execute();
         $stmt->close();
 
@@ -1999,7 +2290,7 @@ class DbHandler
         return $result;
     }
 
-    public function placeOrder($user_id, $pro_id, $pro_price, $pro_qty,$shipping_address, $payment_method, $total_cost, $discount_amount, $shipping_cost )
+    public function placeOrder($user_id, $pro_id, $pro_price, $pro_qty, $shipping_address, $payment_method, $total_cost, $discount_amount, $shipping_cost)
     {
         $sql_query = "CALL placeOrder(?,?,?,?,?,?,?,?,?,@is_done,@last_order_id)";
         $stmt = $this->conn->prepare($sql_query);
